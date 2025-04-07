@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jack a soif</title>
+  <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
+  <style>
+    /* Styles en vert et blanc */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #dff0d8 0%, #ffffff 100%);
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    /* En-tête avec bouton de rappel de commande */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .btn-copy {
+      position: absolute;
+      left: 0;
+      background: transparent;
+      border: none;
+      color: #27ae60;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+    h1 {
+      margin: 0;
+      color: #27ae60;
+      text-align: center;
+    }
+    .category {
+      margin-bottom: 20px;
+    }
+    .category h2 {
+      margin: 0 0 10px 0;
+      padding: 10px;
+      background: #27ae60;
+      color: #fff;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .drinks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .drink {
+      position: relative;
+      flex: 1 1 calc(45% - 10px);
+      padding: 15px;
+      background: #fff;
+      border: 2px solid #27ae60;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .drink:hover {
+      transform: scale(1.05);
+      background: #e9f7ef;
+    }
+    /* Animation "+1" */
+    .plus-one {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20px;
+      color: #27ae60;
+      opacity: 1;
+      pointer-events: none;
+      animation: fadeUp 1s forwards;
+    }
+    @keyframes fadeUp {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -80%) scale(1.5); opacity: 0; }
+    }
+    .manual-add {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .manual-add input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      border: 2px solid #27ae60;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .manual-add input[type="button"] {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #27ae60;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .manual-add input[type="button"]:hover {
+      background: #1e8449;
+    }
+    .order-summary {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .order-item {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 0;
+    }
+    .order-item:last-child {
+      border-bottom: none;
+    }
+    .item-name {
+      flex: 1;
+      text-align: left;
+    }
+    .item-quantity {
+      width: 50px;
+      text-align: right;
+      margin-right: 10px;
+    }
+    .order-item button {
+      background: transparent;
+      border: none;
+      color: #27ae60;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .order-total {
+      text-align: right;
+      font-weight: bold;
+      padding-top: 10px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 15px;
+      background: #27ae60;
+      color: #fff;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #1e8449;
+    }
+    .btn-reset {
+      background: #e74c3c;
+    }
+    .btn-reset:hover {
+      background: #c0392b;
+    }
+    /* Badge affichant le total des verres, toujours visible en haut à droite */
+    .order-count {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      background: #27ae60;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <!-- Badge affichant le total des verres commandés, toujours visible en haut à droite -->
+  <div id="orderCount" class="order-count">Total : 0</div>
+
+  <div class="container">
+    <div class="header">
+      <button class="btn-copy" onclick="copierDerniereCommande()">remets la même !!</button>
+      <h1>Jack a soif</h1>
+    </div>
+
+    <!-- Catégorie Bière -->
+    <div class="category">
+      <h2>Bière</h2>
+      <div class="drinks">
+        <div class="drink" onclick="ajouterBoisson('bière', this)">bière</div>
+        <div class="drink" onclick="ajouterBoisson('panaché', this)">panaché</div>
+        <div class="drink" onclick="ajouterBoisson('tango', this)">tango</div>
+        <div class="drink" onclick="ajouterBoisson('mazout', this)">mazout</div>
+        <div class="drink" onclick="ajouterBoisson('half', this)">half</div>
+        <div class="drink" onclick="ajouterBoisson('Val Dieu', this)">Val Dieu</div>
+      </div>
+    </div>
+
+    <!-- Catégorie Soft -->
+    <div class="category">
+      <h2>Soft</h2>
+      <div class="drinks">
+        <div class="drink" onclick="ajouterBoisson('coca', this)">coca</div>
+        <div class="drink" onclick="ajouterBoisson('coca light', this)">coca light</div>
+        <div class="drink" onclick="ajouterBoisson('coca zéro', this)">coca zéro</div>
+        <div class="drink" onclick="ajouterBoisson('eau plate', this)">eau plate</div>
+        <div class="drink" onclick="ajouterBoisson('eau pétillante', this)">eau pétillante</div>
+      </div>
+    </div>
+
+    <!-- Catégorie Vin -->
+    <div class="category">
+      <h2>Vin</h2>
+      <div class="drinks">
+        <div class="drink" onclick="ajouterBoisson('vin blanc', this)">vin blanc</div>
+        <div class="drink" onclick="ajouterBoisson('vin rosé', this)">vin rosé</div>
+        <div class="drink" onclick="ajouterBoisson('vin rouge', this)">vin rouge</div>
+      </div>
+    </div>
+
+    <!-- Catégorie Alcool -->
+    <div class="category">
+      <h2>Alcool</h2>
+      <div class="drinks">
+        <div class="drink" onclick="ajouterBoisson('blanc orange', this)">blanc orange</div>
+        <div class="drink" onclick="ajouterBoisson('blanc coca', this)">blanc coca</div>
+      </div>
+    </div>
+
+    <!-- Ajout manuel d'une boisson -->
+    <div class="manual-add">
+      <h2>Ajouter une boisson manuellement</h2>
+      <input type="text" id="boisson-manuel" placeholder="Nom de la boisson">
+      <input type="button" value="Ajouter" onclick="ajouterBoissonManuelle()">
+    </div>
+
+    <!-- Récapitulatif de la commande -->
+    <div class="order-summary">
+      <h2>Récapitulatif de la commande</h2>
+      <div id="recap"></div>
+      <div class="btn-group">
+        <button class="btn" onclick="terminerCommande()">Valider la commande</button>
+        <button class="btn btn-reset" onclick="resetCommande()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let commande = {};
+
+    function ajouterBoisson(nom, elem) {
+      if (commande[nom]) {
+        commande[nom]++;
+      } else {
+        commande[nom] = 1;
+      }
+      if (elem) {
+        afficherAnimationPlusOne(elem);
+      }
+      afficherRecap();
+    }
+
+    function afficherAnimationPlusOne(elem) {
+      const span = document.createElement('span');
+      span.className = "plus-one";
+      span.textContent = "+1";
+      elem.appendChild(span);
+      setTimeout(() => {
+        if (elem.contains(span)) {
+          elem.removeChild(span);
+        }
+      }, 1000);
+    }
+
+    function ajouterBoissonManuelle() {
+      const input = document.getElementById('boisson-manuel');
+      const nom = input.value.trim();
+      if (nom !== '') {
+        ajouterBoisson(nom);
+        input.value = '';
+      } else {
+        alert('Veuillez saisir un nom de boisson.');
+      }
+    }
+
+    function afficherRecap() {
+      const recapDiv = document.getElementById('recap');
+      recapDiv.innerHTML = '';
+      let total = 0;
+      for (const boisson in commande) {
+        total += commande[boisson];
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'order-item';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'item-name';
+        nameSpan.textContent = boisson;
+        const qtySpan = document.createElement('span');
+        qtySpan.className = 'item-quantity';
+        qtySpan.textContent = 'x ' + commande[boisson];
+        const btnDelete = document.createElement('button');
+        btnDelete.innerHTML = '&times;';
+        btnDelete.onclick = () => supprimerLigne(boisson);
+        itemDiv.appendChild(nameSpan);
+        itemDiv.appendChild(qtySpan);
+        itemDiv.appendChild(btnDelete);
+        recapDiv.appendChild(itemDiv);
+      }
+      const totalDiv = document.createElement('div');
+      totalDiv.className = 'order-total';
+      totalDiv.textContent = "Total : " + total;
+      recapDiv.appendChild(totalDiv);
+
+      // Mise à jour du badge dans le coin supérieur droit
+      document.getElementById('orderCount').textContent = "Total : " + total;
+    }
+
+    function supprimerLigne(boisson) {
+      delete commande[boisson];
+      afficherRecap();
+    }
+
+    function terminerCommande() {
+      if (Object.keys(commande).length === 0) {
+        alert('Aucune boisson sélectionnée.');
+        return;
+      }
+      // Sauvegarde de la dernière commande dans le cache
+      localStorage.setItem("lastCommande", JSON.stringify(commande));
+
+      let total = 0;
+      let recapHtml = "<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>";
+      recapHtml += "<title>Commande - Jack a soif</title>";
+      recapHtml += "<link href='https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap' rel='stylesheet'>";
+      recapHtml += "<style>";
+      recapHtml += "body { font-family: 'Poppins', sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #dff0d8 0%, #ffffff 100%); color: #333; }";
+      recapHtml += ".container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }";
+      recapHtml += "h1 { text-align: center; color: #27ae60; }";
+      recapHtml += ".order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }";
+      recapHtml += ".order-item:last-child { border-bottom: none; }";
+      recapHtml += ".order-total { text-align: right; font-weight: bold; padding-top: 10px; }";
+      recapHtml += ".close-btn { display: block; margin: 20px auto; padding: 10px 20px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }";
+      recapHtml += ".close-btn:hover { background: #c0392b; }";
+      recapHtml += "</style></head>";
+      recapHtml += "<body><div class='container'><h1>Votre commande</h1>";
+      for (const boisson in commande) {
+        total += commande[boisson];
+        recapHtml += "<div class='order-item'><span>" + boisson + "</span><span>x " + commande[boisson] + "</span></div>";
+      }
+      recapHtml += "<div class='order-total'>Total : " + total + "</div>";
+      recapHtml += "<button class='close-btn' onclick='window.close()'>Fermer</button>";
+      recapHtml += "</div></body></html>";
+
+      const newWin = window.open("", "_blank");
+      newWin.document.open();
+      newWin.document.write(recapHtml);
+      newWin.document.close();
+
+      resetCommande();
+    }
+
+    function resetCommande() {
+      commande = {};
+      afficherRecap();
+    }
+
+    function copierDerniereCommande() {
+      let lastCommande = localStorage.getItem("lastCommande");
+      if (lastCommande) {
+        commande = JSON.parse(lastCommande);
+        afficherRecap();
+      } else {
+        alert("Aucune commande sauvegardée.");
+      }
+    }
+  </script>
+</body>
+</html>
