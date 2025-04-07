@@ -22,7 +22,7 @@
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-    /* En-tête avec mise en page en 3 colonnes */
+    /* En-tête avec 3 colonnes */
     .header {
       display: flex;
       align-items: center;
@@ -192,7 +192,7 @@
     .btn-reset:hover {
       background: #c0392b;
     }
-    /* Badge affichant le total, toujours visible en haut à droite */
+    /* Badge affichant le total des verres, toujours visible en haut à droite */
     .order-count {
       position: fixed !important;
       top: 20px !important;
@@ -379,7 +379,7 @@
       recapHtml += ".order-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }";
       recapHtml += ".order-item:last-child { border-bottom: none; }";
       recapHtml += ".order-total { text-align: right; font-weight: bold; padding-top: 10px; }";
-      // Modification du bouton "Fermer" : appel de window.opener.focus() avant de fermer
+      // Modification du bouton "Fermer" pour smartphone : redirige vers index.html
       recapHtml += ".close-btn { display: block; margin: 20px auto; padding: 10px 20px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }";
       recapHtml += ".close-btn:hover { background: #c0392b; }";
       recapHtml += "</style></head>";
@@ -389,8 +389,8 @@
         recapHtml += "<div class='order-item'><span>" + boisson + "</span><span>x " + commande[boisson] + "</span></div>";
       }
       recapHtml += "<div class='order-total'>Total : " + total + "</div>";
-      // Le bouton "Fermer" appelle window.opener.focus() puis window.close()
-      recapHtml += "<button class='close-btn' onclick='window.opener.focus(); window.close()'>Fermer</button>";
+      // Le bouton "Fermer" vérifie si window.opener est accessible, sinon redirige vers index.html
+      recapHtml += "<button class='close-btn' onclick='if(window.opener && !window.opener.closed){ window.opener.focus(); window.close(); } else { window.location.href=\"index.html\"; }'>Fermer</button>";
       recapHtml += "</div></body></html>";
 
       const newWin = window.open("", "_blank");
